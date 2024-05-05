@@ -1,4 +1,4 @@
-# ハンズオンチームの秘密基地＃＃＃ステージング環境＃＃＃
+# ハンズオンチームの秘密基地
 
 ## ここはなに？
 
@@ -16,7 +16,7 @@
 git init
 
 # リモートリポジトリに接続
-git remote add origin https://github.com/masaru-study/-----test-----verify-note.git
+git remote add origin https://github.com/masaru-study/verify-note.git
 
 # リモートリポジトリの内容を取得
 git fetch
@@ -42,7 +42,7 @@ git commit -m "#コミットコメントを入れる#"
 git push origin #ローカルブランチ名#
 ```
 
-3. [Github リポジトリ](https://github.com/masaru-study/-----test-----verify-note)に Web アクセスして結合する。
+3. [Github リポジトリ](https://github.com/masaru-study/verify-note)に Web アクセスして結合する。
    1. Pull Request
    2. New Pull Request
    3. base:main ← compare:#ローカルブランチ名#
@@ -51,20 +51,11 @@ git push origin #ローカルブランチ名#
    6. Create pull request
    7. Merge pull request
    8. Conform Merge
-4. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
+4. [公開 Web ページ](https://masaru-study.github.io/verify-note/)を確認して更新されていれば完了
 
 ## 付録:Discord 通知を無しにする場合
 
 プロジェクトのルートディレクトリに no_discord.txt を配置すると Discord 通知を行わなくなります。
-ステージング環境ではテストする際に Github の設定から secrets の書き換えが必要になります。
-書き換えると他の人がテストできないので注意してください。書き換え後に復元はできません。
-
-1. Settings
-2. Secrets and variables
-3. Actions
-4. Repository secrets → DISCORD_WEBHOOK_STAGING → 鉛筆マーク
-5. Discord から発行してきた URL を貼り付ける
-6. 末尾に /github をつける
 
 ## 付録:ディレクトリ構造
 
