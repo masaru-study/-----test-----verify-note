@@ -56,15 +56,16 @@ git push origin #ローカルブランチ名#
 ## 付録:Discord 通知を無しにする場合
 
 プロジェクトのルートディレクトリに no_discord.txt を配置すると Discord 通知を行わなくなります。
-ステージング環境ではテストする際に Github の設定から secrets の書き換えが必要になります。
-書き換えると他の人がテストできないので注意してください。書き換え後に復元はできません。
+
+> [!WARNING]
+> ステージング環境ではテストする際に Github の設定から secrets の書き換えが必要になります。
+> 書き換えると他の人がテストできないので注意してください。書き換え後に復元はできません。
 
 1. Settings
 2. Secrets and variables
 3. Actions
 4. Repository secrets → DISCORD_WEBHOOK_STAGING → 鉛筆マーク
 5. Discord から発行してきた URL を貼り付ける
-6. 末尾に /github をつける
 
 ## 付録:ディレクトリ構造
 

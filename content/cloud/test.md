@@ -7,4 +7,4 @@ categories = ["Server", "Cloud"]
 tags = ["Autor:あゆむ", "test"]
 +++
 
-テスト投稿だよ
+テスト投稿だよ 2
