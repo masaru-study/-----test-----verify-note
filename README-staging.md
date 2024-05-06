@@ -1,4 +1,7 @@
-# ハンズオンチームの秘密基地＃＃＃ステージング環境＃＃＃
+# ハンズオンチームの秘密基地
+
+> [!IMPORTANT]
+> ここはステージング環境です。
 
 ## ここはなに？
 
@@ -53,9 +56,23 @@ git push origin #ローカルブランチ名#
    8. Conform Merge
 4. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
 
-## 付録:Discord 通知を無しにする場合
+## 付録:Discord 通知
+
+### 通知の無効化
 
 プロジェクトのルートディレクトリに no_discord.txt を配置すると Discord 通知を行わなくなります。
+
+### 通知のテスト
+
+> [!WARNING]
+> ステージング環境ではテストする際に Github の設定から secrets の書き換えが必要になります。
+> 書き換えると他の人がテストできないので注意してください。書き換え後に復元はできません。
+
+1. Settings
+2. Secrets and variables
+3. Actions
+4. Repository secrets → DISCORD_WEBHOOK_STAGING → 鉛筆マーク
+5. Discord から発行してきた URL を貼り付ける
 
 ## 付録:ディレクトリ構造
 
@@ -81,10 +98,10 @@ git push origin #ローカルブランチ名#
 │       └── ＊＊＊.md
 │
 ├── static
-│   ├── img               ・・・画像を入れるフォルダ。記事内で../../img/＊＊＊とすると参照する。
+│   ├── img               ・・・画像を入れるフォルダ。記事内で/img/＊＊＊とすると参照する。
 │   │   ├── ＊＊＊.py
 │   │   └── ＊＊＊.zip
-│   └── other             ・・・画像以外を入れるフォルダ。記事内で../../file/＊＊＊とすると参照する。
+│   └── other             ・・・画像以外を入れるフォルダ。記事内で/file/＊＊＊とすると参照する。
 │       ├── ＊＊＊.svg
 │       └── ＊＊＊.jpg
 │
