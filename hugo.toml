@@ -1,4 +1,4 @@
-baseURL = ''
+baseURL = '/'
 languageCode = 'ja'
 title = 'まさるの勉強部屋 ハンズオンチーム'
 theme = 'hugo-theme-relearn'
