@@ -69,6 +69,22 @@ jobs:
         with:
           files: ./no_discord.txt
 
+      # 記事にAuthorタグがついているかチェックする。
+      - name: Post author tag check
+        run: |
+          for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
+            cat $file | grep "tags \= \[\"Autor:" &> /dev/null
+            [ $? -eq 1 ] && notagfile+=("$file")
+          done
+          echo "notagfile=$notagfile" >> $GITHUB_ENV
+
+      # Authorタグがついていない記事が存在していたらエラーにする。
+      - name: ERROR Action
+        if: env.notagfile != null
+        run: |
+          echo "::error:: ${{ env.notagfile }}"
+          exit 1
+
       # Hugoでビルドする
       - name: Build with Hugo
         env:
