@@ -71,18 +71,17 @@ jobs:
 
       # 記事にAuthorタグがついているかチェックする。
       - name: Post author tag check
-        continue-on-error: true
         run: |
           for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
-            echo "1:$file"
-            grep "tags \= \[\"Autor:" $file &> /dev/null
-            echo "2"
+            echo "--------1:$file ------------"
+            grep "tags \= \[\"Autor:" $file
+            echo "--------2"
             [ $? -eq 1 ] && notagfile+=("$file")
-            echo "3"
+            echo "--------3"
           done
-          echo "4"
+          echo "--------4"
           echo "notagfile=$notagfile" >> $GITHUB_ENV
-          echo "5"
+          echo "--------5"
 
       # Authorタグがついていない記事が存在していたらエラーにする。
       - name: ERROR Action
