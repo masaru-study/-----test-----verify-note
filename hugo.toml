@@ -1,7 +1,9 @@
-baseURL = '/'
+baseURL = ''
 languageCode = 'ja'
 title = 'まさるの勉強部屋 ハンズオンチーム'
 theme = 'hugo-theme-relearn'
+relativeURLs = true  #相対パスでリンクする
+
 
 [outputs]
   home = ['html', 'rss', 'search', 'searchpage'] # 検索機能オプション
