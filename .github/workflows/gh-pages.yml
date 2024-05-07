@@ -60,7 +60,7 @@ jobs:
             echo "message_exists=false" >> $GITHUB_OUTPUT
           fi
 
-      # commitコメントの先頭にno_discordが含まれているか確認。
+      # 通知条件の判断結果を出力。
       - name: Decision notification
         id: decision
         run: |
@@ -84,6 +84,16 @@ jobs:
         run: |
           echo "${{ toJSON(github.event) }}"
 
+      # githubのWebGUIからRUNした時に出力される共通文字列を削除する。
+      - name: WebGUI message delete
+        id: webgui
+        run: |
+          message="$( echo "${{ github.event.head_commit.message }}" )"
+          message="$( echo "${message}" | sed -ne "s/^Merge pull request #[0-9]+ from ${{ github.event.repository.organization }}.*$//g" )"
+          message="$( echo "${message}" | sed -ne "s/\r//g" | sed -nez "s/\n//g" )"
+          message="$( echo "${message}" | sed -ne "s/^ +//g" )"
+          echo "modify=\"${message}\"" >> $GITHUB_OUTPUT
+
       # Discord通知内容を格納
       - name: Notification message create
         id: message
@@ -91,7 +101,7 @@ jobs:
           {
             echo 'TEXT<<EOF'
             echo "${{ github.event.head_commit.author.name }} がページを更新しました。"
-            echo "【${{ github.event.head_commit.message }}】"
+            echo "【${{ steps.webgui.outputs.modify }}】"
             echo "https://masaru-study.github.io/verify-note/"
             echo EOF
           } >> "$GITHUB_OUTPUT"
