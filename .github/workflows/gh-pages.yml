@@ -47,7 +47,7 @@ jobs:
           files: ./no_discord.txt
 
       # 記事にAuthorタグがついているかチェックする。
-      - name: Post author tag check
+      - name: Front Matter check
         run: |
           er_cnt=0
           for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
@@ -58,3 +58,4 @@ jobs:
             fi
           done
           [ $er_cnt -ne 0 ] && exit 1
+          exit 0
