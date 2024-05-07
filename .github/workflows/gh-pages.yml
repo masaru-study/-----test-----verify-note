@@ -48,11 +48,10 @@ jobs:
 
       # 記事にAuthorタグがついているかチェックする。
       - name: Post author tag check
-        continue-on-error: true
         run: |
           er_cnt=0
           for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
-            tag_author=$(cat $file | sed -n -E -e "/tags \= \[/p" | sed -n -E -e "/Autor:/p")
+            tag_author=$(cat $file | sed -n -E -e "/tags \= \[/p" | sed -n -E -e "/Author:/p")
             if [ -z "$tag_author" ]; then
               echo "::error:: No Author Tag: $file"
               er_cnt=$(expr $er_cnt + 1)
