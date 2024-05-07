@@ -53,7 +53,7 @@ jobs:
           for file in $(find ./content/ -name '*.md' | sed -ne "/_index.md/d"); do
             tag_author=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Author:/p")
             if [ -z "$tag_author" ]; then
-              echo "::error:: No Author Tag: $file"
+              echo "::error:: No Tag \"Author\": $file"
               er_cnt=$(expr $er_cnt + 1)
             fi
           done
