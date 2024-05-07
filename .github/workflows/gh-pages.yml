@@ -50,12 +50,11 @@ jobs:
       - name: Front Matter check
         run: |
           er_cnt=0
-          for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
-            tag_author=$(cat $file | sed -n -E -e "/tags \= \[/p" | sed -n -E -e "/Author:/p")
+          for file in $(find ./content/ -name '*.md' | sed -ne "/_index.md/d"); do
+            tag_author=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Author:/p")
             if [ -z "$tag_author" ]; then
               echo "::error:: No Author Tag: $file"
               er_cnt=$(expr $er_cnt + 1)
             fi
           done
-          [ $er_cnt -ne 0 ] && exit 1
-          exit 0
+          if [ $er_cnt -eq 0 ]; then exit 0; else exit 1; fi
