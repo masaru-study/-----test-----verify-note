@@ -54,7 +54,7 @@ jobs:
       - name: Check notification no_message
         id: no_message
         run: |
-          if [ "$(echo "${{ github.event.head_commit.message }}" | sed -ne "/[Nn][Oo]_[Dd][Ii][Ss][Cc][Oo][Rr][Dd]/p")" ]; then
+          if [ -n "$(echo "${{ github.event.head_commit.message }}" | sed -ne "/[Nn][Oo]_[Dd][Ii][Ss][Cc][Oo][Rr][Dd]/p")" ]; then
             echo "message_exists=true" >> $GITHUB_OUTPUT
           else
             echo "message_exists=false" >> $GITHUB_OUTPUT
