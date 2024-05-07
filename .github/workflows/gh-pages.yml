@@ -25,7 +25,7 @@ defaults:
     shell: bash
 
 jobs:
-  build:
+  deploy:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
     env:
