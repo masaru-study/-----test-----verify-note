@@ -50,7 +50,8 @@ jobs:
       - name: Post author tag check
         run: |
           for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
-            echo $file
+            check=$(cat $file | grep "tags \= [" | grep "Author:")
+            echo "$file : $check"
             notagfile+=("$file")
           done
           echo "notagfile=$notagfile" >> $GITHUB_ENV
