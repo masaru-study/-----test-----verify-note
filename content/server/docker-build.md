@@ -4,7 +4,7 @@ date = 2024-05-04T00:00:00+09:00
 weight = 3
 draft = false
 categories = ["Server"]
-tags = ["Author:nakata", "Docker", "LinuC"]
+tags = ["Author:nakata", "Level:中級", "Docker", "LinuC"]
 +++
 
 ## 参考サイト
@@ -32,7 +32,6 @@ https://supilog.supisupi.com/blog/2p77qe6np5e4/
 - wget
 - docker-ce
 - docker-compose(git からダウンロード)
-  ※LXC の場合、上記以外にもパッケージが必要になる場合があります。
 
 ## 構築
 

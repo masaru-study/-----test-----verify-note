@@ -31,6 +31,10 @@ jobs:
     env:
       HUGO_VERSION: 0.125.4
 
+    # 通知条件の判断結果を別jobに渡す
+    outputs:
+      skip_notification: ${{ steps.decision.outputs.skip_notification }}
+
     steps:
       # ブランチの内容をチェックアウト（ダウンロード）する
       - name: Checkout
@@ -39,31 +43,60 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      # no_discord.txtがあるか確認。
-      - name: Check file notification
-        id: no_discord
+      # ルートディレクトリにno_discord.txtがあるか確認。
+      - name: Check notification no_file
+        id: no_file
         uses: andstor/file-existence-action@v3
         with:
           files: ./no_discord.txt
 
-      # 記事の必須要件をチェックする。
-      - name: Front Matter check
+      # commitコメントの先頭にno_discordが含まれているか確認。
+      - name: Check notification no_message
+        id: no_message
         run: |
-          er_cnt=0
-          # _index.md以外の記事には、Authorタグが含まれている。
-          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d"); do
-            tag_author=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Author:/p")
-            if [ -z "$tag_author" ]; then
-              echo "::error:: No Tag \"Author\": $file"
-              er_cnt=$(expr $er_cnt + 1)
-            fi
-          done
-          # _index.md以外またはGeneralカテゴリ以外の記事には、Levelタグが含まれている。
-          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d" | sed -e "/content\/general/d"); do
-            tag_level=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Level:/p")
-            if [ -z "$tag_level" ]; then
-              echo "::error:: No Tag \"Level\": $file"
-              er_cnt=$(expr $er_cnt + 1)
-            fi
-          done
-          if [ $er_cnt -eq 0 ]; then exit 0; else exit 1; fi
+          if [ -n $(echo ${{ github.event.head_commit.message }} | sed -ne "/[Nn][Oo]_[Dd][Ii][Ss][Cc][Oo][Rr][Dd]/p") ]; then
+            echo "message_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "message_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # commitコメントの先頭にno_discordが含まれているか確認。
+      - name: Decision notification
+        id: decision
+        run: |
+          if [ ${{ steps.no_file.outputs.files_exists }} = 'true' ] || [ ${{ steps.no_message.outputs.message_exists }} = 'true' ]; then
+            echo "skip_notification=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_notification=false" >> $GITHUB_OUTPUT
+          fi
+
+  Notification:
+    # ジョブに必要な定義
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    # 通知条件を満たしていない場合はジョブ自体をスキップ。
+    if: needs.build.outputs.skip_notification != 'true'
+
+    steps:
+      # Discord通知内容を格納
+      - name: Notification message create
+        id: message
+        run: |
+          {
+            echo 'TEXT<<EOF'
+            echo "${{ github.event.head_commit.author.name }} がページを更新しました。"
+            echo "【${{ github.event.head_commit.message }}】"
+            echo "https://masaru-study.github.io/verify-note/"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      # Discord通知を実施。
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_STAGING }}
+          #DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_NOTICE }}
+          DISCORD_USERNAME: "ハンズオンチーム"
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: ${{ steps.message.outputs.text }}
