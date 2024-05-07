@@ -51,9 +51,9 @@ jobs:
         continue-on-error: true
         run: |
           for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
-            check=$(cat $file | sed -n -E -e "/tags \= \[/p" | sed -n -E -e "/Autor:/p")
-            echo "$file : $check"
-            notagfile+=("$file")
+            check=$(cat $file | sed -nEe "/tags \= \[/p" | sed -nEe "/Autor:/p")
+            echo $file
+            [ -z $check ] && notagfile+=("$file")
           done
           echo "notagfile=$notagfile" >> $GITHUB_ENV
 
@@ -61,5 +61,6 @@ jobs:
       - name: ERROR Action
         if: env.notagfile != null
         run: |
-          echo "::error:: ${{ env.notagfile }}"
+          echo "${{toJSON(env)}}"
+          echo "${{ env }}"
           exit 1
