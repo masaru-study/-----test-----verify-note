@@ -25,7 +25,7 @@ defaults:
     shell: bash
 
 jobs:
-  deploy:
+  build:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
     env:
@@ -78,7 +78,7 @@ jobs:
   Notification:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: build
 
     # 通知条件を満たしていない場合はジョブ自体をスキップ。
     if: needs.build.outputs.skip_notification != 'true'
@@ -87,7 +87,7 @@ jobs:
       # Discord通知内容のデバッグ用
       - name: Logging
         run: |
-          echo "${{toJSON(github.event)}}"
+          echo "${{ toJSON(github.event) }}"
 
       # Discord通知内容を格納
       - name: Notification message create
