@@ -54,7 +54,7 @@ jobs:
       - name: Check notification no_message
         id: no_message
         run: |
-          if [ -n $(echo "${{ github.event.head_commit.message }}" | sed -ne "/[Nn][Oo]_[Dd][Ii][Ss][Cc][Oo][Rr][Dd]/p") ]; then
+          if [ $(echo "${{ github.event.head_commit.message }}" | sed -ne "/[Nn][Oo]_[Dd][Ii][Ss][Cc][Oo][Rr][Dd]/p") ]; then
             echo "message_exists=true" >> $GITHUB_OUTPUT
           else
             echo "message_exists=false" >> $GITHUB_OUTPUT
@@ -70,6 +70,11 @@ jobs:
             echo "skip_notification=false" >> $GITHUB_OUTPUT
           fi
 
+      # Debug
+      - name: Decision notification
+        run: |
+          echo ${{ steps.decision.outputs.skip_notification }}
+
   Notification:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
@@ -80,9 +85,9 @@ jobs:
 
     steps:
       # Discord通知内容のデバッグ用
-      #- name: Logging
-      #  run: |
-      #    echo "${{toJSON(github.event)}}"
+      - name: Logging
+        run: |
+          echo "${{toJSON(github.event)}}"
 
       # Discord通知内容を格納
       - name: Notification message create
@@ -97,7 +102,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # Discord通知を実施。
-      - name: Send Discord notification
+      - name: Send Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_STAGING }}
           #DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_NOTICE }}
