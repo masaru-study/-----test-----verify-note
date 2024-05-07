@@ -50,12 +50,15 @@ jobs:
       - name: Front Matter check
         run: |
           er_cnt=0
-          for file in $(find ./content/ -name '*.md' | sed -ne "/_index\.md/d"); do
-            echo $file
+          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d"); do
             tag_author=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Author:/p")
-            echo $tag_author
             if [ -z "$tag_author" ]; then
               echo "::error:: No Tag \"Author\": $file"
+              er_cnt=$(expr $er_cnt + 1)
+            fi
+            tag_level=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Level:/p")
+            if [ -z "$tag_level" ]; then
+              echo "::error:: No Tag \"Level\": $file"
               er_cnt=$(expr $er_cnt + 1)
             fi
           done
