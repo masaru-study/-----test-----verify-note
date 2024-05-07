@@ -50,17 +50,12 @@ jobs:
       - name: Post author tag check
         continue-on-error: true
         run: |
+          er_cnt=0
           for file in $(find ./content/ -name '*.md' | grep -vE _index.md); do
-            check=$(cat $file | sed -nEe "/tags \= \[/p" | sed -nEe "/Autor:/p")
-            echo $file
-            [ -z $check ] && notagfile+=("$file")
+            tag_author=$(cat $file | sed -n -E -e "/tags \= \[/p" | sed -n -E -e "/Autor:/p")
+            if[ -z $tag_author ]; then
+              echo "::error:: No Author Tag: $file"
+              er_cnt=$(expr $er_cnt + 1)
+            fi
           done
-          echo "notagfile=$notagfile" >> $GITHUB_ENV
-
-      # Authorタグがついていない記事が存在していたらエラーにする。
-      - name: ERROR Action
-        if: env.notagfile != null
-        run: |
-          echo "${{toJSON(env)}}"
-          echo "${{ env }}"
-          exit 1
+          [ $er_cnt -ne 0 ] && exit 1
