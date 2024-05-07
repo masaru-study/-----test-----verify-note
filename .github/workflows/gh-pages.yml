@@ -70,11 +70,6 @@ jobs:
             echo "skip_notification=false" >> $GITHUB_OUTPUT
           fi
 
-      # Debug
-      - name: Decision notification
-        run: |
-          echo ${{ steps.decision.outputs.skip_notification }}
-
   Notification:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
