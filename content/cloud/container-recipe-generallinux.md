@@ -4,7 +4,7 @@ date = 2024-05-03T02:56:41+09:00
 weight = 1
 draft = false
 categories = ["Server", "Cloud"]
-tags = ["Autor:あゆむ", "Docker"]
+tags = ["Author:あゆむ", "Docker"]
 +++
 
 ## docker-compose.yml
@@ -218,7 +218,7 @@ USER root
 
 # OSパッケージの不要ファイル掃除
 RUN apt-get upgrade -y \
- && apt-get autoremove -y \
+ && apt-get Authoremove -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

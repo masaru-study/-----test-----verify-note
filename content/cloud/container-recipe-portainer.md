@@ -4,7 +4,7 @@ date = 2024-05-05T03:36:26+09:00
 weight = 1
 draft = false
 categories = ["Server", "Cloud"]
-tags = ["Autor:あゆむ", "Docker"]
+tags = ["Author:あゆむ", "Docker"]
 +++
 
 ## docker-compose.yml

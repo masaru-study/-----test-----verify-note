@@ -4,7 +4,7 @@ date = 2024-05-04T17:18:05+09:00
 weight = 12
 draft = false
 categories = ["Server"]
-tags = ["Autor:DD Erikson", "Storage", "Linux", "LPIC/LinuC"]
+tags = ["Storage", "Linux", "LPIC/LinuC","Author:DD Erikson"]
 +++
 
 ## 目次
