@@ -1,7 +1,7 @@
 name: Deploy Hugo site to Pages
 
 # トリガー
-"on":
+on:
   push:
     branches:
       - main
@@ -16,7 +16,7 @@ permissions:
 # 同時デプロイ防止してスキップする。
 # ただし実行中デプロイはキャンセルしない。
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: false
 
 # Github Runnerのシェル
@@ -31,7 +31,7 @@ jobs:
     env:
       HUGO_VERSION: 0.125.4
 
-    # 通知条件の判断結果を別jobに渡す
+    # Discord通知有無を別jobに渡す
     outputs:
       skip_notification: ${{ steps.decision.outputs.skip_notification }}
 
@@ -42,6 +42,28 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+      # 記事の必須要件をチェック。
+      - name: Front Matter check
+        run: |
+          er_cnt=0
+          # _index.md以外の記事には、Authorタグが含まれている。
+          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d"); do
+            tag_author=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Author:/p")
+            if [ -z "$tag_author" ]; then
+              echo "::error:: No Tag \"Author\": $file"
+              er_cnt=$(expr $er_cnt + 1)
+            fi
+          done
+          # _index.md以外またはGeneralカテゴリ以外の記事には、Levelタグが含まれている。
+          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d" | sed -e "/content\/general/d"); do
+            tag_level=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Level:/p")
+            if [ -z "$tag_level" ]; then
+              echo "::error:: No Tag \"Level\": $file"
+              er_cnt=$(expr $er_cnt + 1)
+            fi
+          done
+          if [ $er_cnt -eq 0 ]; then exit 0; else exit 1; fi
 
       # ルートディレクトリにno_discord.txtがあるか確認。
       - name: Check notification no_file
@@ -70,10 +92,61 @@ jobs:
             echo "skip_notification=false" >> $GITHUB_OUTPUT
           fi
 
-  Notification:
+      # Hugoのインストール
+      - name: Install Hugo CLI
+        run: |
+          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      # Hugo依存関係パッケージのインストール
+      - name: Install Dart Sass
+        run: sudo snap install dart-sass
+
+      # Github Pagesを設定
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      # Github Pages依存関係パッケージのインストール
+      - name: Install Node.js dependencies
+        run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
+
+      # Hugoでビルドする
+      - name: Build with Hugo
+        env:
+          HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
+          TZ: Asia/Tokyo
+        run: |
+          hugo \
+            --gc \
+            --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
+
+      # ビルドした結果をアップロード
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
     needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # ビルドした結果をデプロイ
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  Notification:
+    # ジョブに必要な定義
+    runs-on: ubuntu-latest
+    needs: deploy
 
     # 通知条件を満たしていない場合はジョブ自体をスキップ。
     if: needs.build.outputs.skip_notification != 'true'
@@ -84,16 +157,6 @@ jobs:
         run: |
           echo "${{ toJSON(github.event) }}"
 
-      # githubのWebGUIからRUNした時に出力される共通文字列を削除する。
-      - name: WebGUI message delete
-        id: webgui
-        run: |
-          message="$( echo "${{ github.event.head_commit.message }}" )"
-          message="$( echo "${message}" | sed -ne "s/^Merge pull request #[0-9]+ from ${{ github.event.repository.organization }}.*$//g" )"
-          message="$( echo "${message}" | sed -ne "s/\r//g" | sed -nez "s/\n//g" )"
-          message="$( echo "${message}" | sed -ne "s/^ +//g" )"
-          echo "modify=\"${message}\"" >> $GITHUB_OUTPUT
-
       # Discord通知内容を格納
       - name: Notification message create
         id: message
@@ -101,7 +164,8 @@ jobs:
           {
             echo 'TEXT<<EOF'
             echo "${{ github.event.head_commit.author.name }} がページを更新しました。"
-            echo "【${{ steps.webgui.outputs.modify }}】"
+            #echo "【${{ steps.webgui.outputs.modify }}】"
+            echo "【${{ github.event.head_commit.message }}】"
             echo "https://masaru-study.github.io/verify-note/"
             echo EOF
           } >> "$GITHUB_OUTPUT"

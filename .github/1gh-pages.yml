@@ -1,0 +1,88 @@
+name: Deploy Hugo site to Pages
+
+# トリガー
+"on":
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# GitHub Pagesに更新するためのGITHUB_TOKEN権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時デプロイ防止してスキップする。
+# ただし実行中デプロイはキャンセルしない。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+# Github Runnerのシェル
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    # ジョブに必要な定義
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.125.4
+
+    # 通知条件の判断結果を別jobに渡す
+    outputs:
+      skip_notification: ${{ steps.decision.outputs.skip_notification }}
+
+    steps:
+      # ブランチの内容をチェックアウト（ダウンロード）する
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # ルートディレクトリにno_discord.txtがあるか確認。
+      - name: Check notification no_file
+        id: no_file
+        uses: andstor/file-existence-action@v3
+        with:
+          files: ./no_discord.txt
+
+      # commitコメントの先頭にno_discordが含まれているか確認。
+      - name: Check notification no_message
+        id: no_message
+        run: |
+          if [ -n "$(echo "${{ github.event.head_commit.message }}" | sed -ne "/[Nn][Oo]_[Dd][Ii][Ss][Cc][Oo][Rr][Dd]/p")" ]; then
+            echo "message_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "message_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 通知条件の判断結果を出力。
+      - name: Decision notification
+        id: decision
+        run: |
+          if [ ${{ steps.no_file.outputs.files_exists }} = 'true' ] || [ ${{ steps.no_message.outputs.message_exists }} = 'true' ]; then
+            echo "skip_notification=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_notification=false" >> $GITHUB_OUTPUT
+          fi
+
+
+          steps:
+            # Discord通知内容のデバッグ用
+            - name: Logging
+              run: |
+                echo "${{ toJSON(github.event) }}"
+
+            # githubのWebGUIからRUNした時に出力される共通文字列を削除する。
+            - name: WebGUI message delete
+              id: webgui
+              run: |
+                message="$( echo "${{ github.event.head_commit.message }}" )"
+                message="$( echo "${message}" | sed -ne "s/^Merge pull request #[0-9]+ from ${{ github.event.repository.organization }}.*$//g" )"
+                message="$( echo "${message}" | sed -ne "s/\r//g" | sed -nez "s/\n//g" )"
+                message="$( echo "${message}" | sed -ne "s/^ +//g" )"
+                echo "modify=\"${message}\"" >> $GITHUB_OUTPUT
