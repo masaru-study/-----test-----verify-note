@@ -164,8 +164,7 @@ jobs:
           {
             echo 'TEXT<<EOF'
             echo "${{ github.event.head_commit.author.name }} がページを更新しました。"
-            #echo "【${{ steps.webgui.outputs.modify }}】"
-            echo "【${{ github.event.head_commit.message }}】"
+            echo "【 $(echo "${{ github.event.head_commit.message }}" | tail -n 1) 】"
             echo "https://masaru-study.github.io/verify-note/"
             echo EOF
           } >> "$GITHUB_OUTPUT"
