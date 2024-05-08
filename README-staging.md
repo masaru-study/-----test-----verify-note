@@ -1,7 +1,7 @@
 # ハンズオンチームの秘密基地
 
-> [!IMPORTANT]
-> ここはステージング環境です。
+    > [!IMPORTANT]
+    > ここはステージング環境です。
 
 ## ここはなに？
 
@@ -34,15 +34,17 @@ git fetch
 
 6. ローカルブランチ作成
 
-````bash
+```bash
 git checkout -b #ローカルブランチ名# origin/main
+```
 
-7. hugoでコンテンツを作成する
+7. hugo でコンテンツを作成する
+
 ```bash
 hugo new content #カテゴリ名#/#ページ名#.md
 もしくは
 content/#カテゴリ名#/#ページ名#.mdを手動で新規作成
-````
+```
 
 8. 記事の Front Matter を編集する
    > [!CAUTION]
@@ -82,10 +84,9 @@ git push origin #ローカルブランチ名#
     2. New Pull Request
     3. base:main ← compare:#ローカルブランチ名#
     4. Create request
-    5. （説明を追加）
-    6. Create pull request
-    7. Merge pull request
-    8. Conform Merge
+    5. Create pull request
+    6. Merge pull request
+    7. Confirm Merge
 
 14. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
 
@@ -93,12 +94,12 @@ git push origin #ローカルブランチ名#
 
 ### 通知の著者名
 
-Github 上の名前が反映されます。デフォルトはアカウント ID です。  
+Github 上の名前が反映されます。デフォルトはアカウント ID です。
 日本語名にしたい場合は、アカウント設定の Public profile の Name を変更してください。
 
 ### 通知の投稿内容文
 
-Merge Message の本文が表示されます。複数行も表示可能です。
+Merge Message の本文が表示されます。複数行も表示可能です。(上記手順の 13-6 ～ 13-7)  
 なお、タイトル文は表示されません。
 ![Merge Message](./.github/README/MergeMessage.PNG)
 
@@ -107,7 +108,8 @@ Merge Message の本文が表示されます。複数行も表示可能です。
 以下のどちらかの条件を満たすと Discord 通知を行わなくなります。
 
 - プロジェクトのルートディレクトリに no_discord.txt を配置する
-- Merge Message の本文に「no_discord」という文字列を含む
+- Merge Message の本文に「no_discord」という文字列を含む(上記手順の 13-7 ～ 13-8)  
+  ![Merge Message](./.github/README/MergeMessage.PNG)
 
 ### 通知のテスト
 
