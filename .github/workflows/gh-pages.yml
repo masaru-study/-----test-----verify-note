@@ -153,9 +153,9 @@ jobs:
 
     steps:
       # Discord通知内容のデバッグ用
-      - name: Logging
-        run: |
-          echo "${{ toJSON(github.event) }}"
+      #- name: Logging
+      #  run: |
+      #    echo "${{ toJSON(github.event) }}"
 
       # Discord通知内容を格納
       - name: Notification message create
