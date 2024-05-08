@@ -25,11 +25,6 @@ services:
       - type: bind
         source: "./bind/host/"
         target: "/host/"
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:9101
-        tag: "docker.{{.Name}}"
     extra_hosts:
       - host.docker.internal:host-gateway
     ports:
