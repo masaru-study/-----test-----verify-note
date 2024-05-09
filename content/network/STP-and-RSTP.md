@@ -8,7 +8,7 @@ tags = ["Author:DD Erikson", "Level:中級", "CCNA", "Spanning Tree Protocol"]
 +++
 
 # STP と RSTP
-20240508TEST
+
 ## STP と RSTP の違い
 
 - STP では BPDU の保持時間（最大エージ 20 秒）の経過後、状態遷移があり、Listening と Learning で 15 秒の転送遅延が有るので最小で 50 秒間の状態遷移時間を経てフォワーディング状態になる

@@ -72,7 +72,7 @@ jobs:
         with:
           files: ./no_discord.txt
 
-      # commitコメントの先頭にno_discordが含まれているか確認。
+      # Merge Messageの本文内にno_discordが含まれているか確認。
       - name: Check notification no_message
         id: no_message
         run: |
@@ -152,11 +152,6 @@ jobs:
     if: needs.build.outputs.skip_notification != 'true'
 
     steps:
-      # Discord通知内容のデバッグ用
-      #- name: Logging
-      #  run: |
-      #    echo "${{ toJSON(github.event) }}"
-
       # Discord通知内容を格納
       - name: Notification message create
         id: message
@@ -172,8 +167,8 @@ jobs:
       # Discord通知を実施。
       - name: Send Discord
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_STAGING }}
-          #DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_NOTICE }}
+          #DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_STAGING }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_NOTICE }}
           DISCORD_USERNAME: "ハンズオンチーム"
         uses: Ilshidur/action-discord@0.3.2
         with:
