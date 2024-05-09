@@ -17,4 +17,4 @@ tags = ["Author:ALL Member", "自己紹介"]
 
 ## Author: あゆむ
 
-工事中１
+工事中
