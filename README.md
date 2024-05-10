@@ -9,11 +9,15 @@
 
 ## つかいかた
 
-- 権限のあるメンバーは hugo を使用して記事を投稿できます。
+権限のあるメンバーは hugo を使用して記事を投稿できます。
+
+> [!TIP]
+> ２回目以降の記事投稿は手順 5 ～ 14 を行ってください。
 
 1. Hugo をローカルにインストールします。
 
 2. git をローカルにインストールします。
+
 3. github CLI をローカルにインストールします。
 
 4. git の初期設定を行います。
@@ -144,11 +148,11 @@
 
    10. ローカルリポジトリ内の post/onamae ブランチをリモートリポジトリ内の post/onamae ブランチに適用します。
 
-   > [!CAUTION]
+   > [!NOTE]
    > 初回適用時はリモートリポジトリ内の post/onamae ブランチの新規作成になります。
 
    ```bash
-   git push origin #ローカルブランチ名#
+   git push origin post/onamae
    ```
 
 7. [Github リポジトリ](https://github.com/masaru-study/-----test-----verify-note)に Web アクセスして結合する。
@@ -162,9 +166,6 @@
    7. Confirm Merge
 
 8. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
-
-> [!TIP]
-> ２回目以降の記事投稿は手順 5 ～ 14 を行ってください。
 
 ## 付録:Discord 通知
 
