@@ -1,8 +1,5 @@
 # ハンズオンチームの秘密基地
 
-> [!IMPORTANT]
-> ここはステージング環境です。
-
 ## ここはなに？
 
 まさるの勉強部屋参加者のハンズオンチームの検証結果置き場です。
@@ -12,7 +9,7 @@
 権限のあるメンバーは hugo を使用して記事を投稿できます。
 
 > [!TIP]
-> ２回目以降の記事投稿は手順 5 ～ 14 を行ってください。
+> ２回目以降の記事投稿は手順 6 ～ 8 を行ってください。
 
 1. Hugo をローカルにインストールします。
 
@@ -37,7 +34,7 @@
    > GitHub.Com
    > HTTPS
    > Paste an authentication token
-   > （発行したPersonal access tokenを貼り付ける）
+   > （githubで発行したPersonal access tokenを貼り付ける）
    gh auth status
    ```
 
@@ -66,7 +63,7 @@
    3. リモートリポジトリに接続します。
 
    ```bash
-   git remote add origin https://github.com/masaru-study/-----test-----verify-note.git
+   git remote add origin https://github.com/masaru-study/verify-note.git
    ```
 
    4. リモートリポジトリの内容を取得します。
@@ -120,9 +117,7 @@
    ```
 
    6. 記事の Front Matter を編集します。
-
-   > [!CAUTION]
-   > 投稿フォルダによって必須タグ要件が異なりますので付録を参照してください。
+      投稿フォルダによって必須タグ要件が異なりますので付録を参照してください。
 
    ```bash
    vim content/#カテゴリ名#/#ページ名#.md
@@ -147,15 +142,13 @@
    ```
 
    10. ローカルリポジトリ内の post/onamae ブランチをリモートリポジトリ内の post/onamae ブランチに適用します。
-
-   > [!NOTE]
-   > 初回適用時はリモートリポジトリ内の post/onamae ブランチの新規作成になります。
+       初回適用時はリモートリポジトリ内の post/onamae ブランチの新規作成になります。
 
    ```bash
    git push origin post/onamae
    ```
 
-7. [Github リポジトリ](https://github.com/masaru-study/-----test-----verify-note)に Web アクセスして結合する。
+7. [Github リポジトリ](https://github.com/masaru-study/verify-note)に Web アクセスして結合する。
 
    1. Pull Request
    2. New Pull Request
@@ -165,7 +158,7 @@
    6. Merge pull request
    7. Confirm Merge
 
-8. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
+8. [公開 Web ページ](https://masaru-study.github.io/verify-note/)を確認して更新されていれば完了
 
 ## 付録:Discord 通知
 
@@ -176,30 +169,18 @@ Github 上の名前が反映されます。デフォルトはアカウント ID 
 
 ### 通知の投稿内容文
 
-Merge Message の本文が表示されます。複数行も表示可能です。(上記手順の 13-6 ～ 13-7)  
+Merge Message の本文が表示されます。複数行も表示可能です。(上記手順の 7-vi ～ 7-vii)  
 なお、タイトル文は表示されません。
-![Merge Message](./.github/README/MergeMessage.PNG)
+![Merge Message](./src-readme/MergeMessage.PNG)
 
 ### 通知の無効化
 
 以下のどちらかの条件を満たすと Discord 通知を行わなくなります。
 
 - プロジェクトのルートディレクトリに no_discord.txt を配置する
-- Merge Message の本文に「no_discord」という文字列を含む(上記手順の 13-6 ～ 13-7)
+- Merge Message の本文に「no_discord」という文字列を含む(上記手順の 7-vi ～ 7-vii)
 
-### 通知のテスト
-
-> [!WARNING]
-> ステージング環境ではテストする際に Github の設定から secrets の書き換えが必要になります。
-> 書き換えると他の人がテストできないので注意してください。書き換え後に復元はできません。
-
-1. Settings
-2. Secrets and variables
-3. Actions
-4. Repository secrets → DISCORD_WEBHOOK_STAGING → 鉛筆マーク
-5. Discord から発行してきた URL を貼り付ける
-
-## 付録:ディレクトリ構造
+## 付録:hugo ディレクトリ構造
 
 ```
 │
@@ -229,8 +210,6 @@ Merge Message の本文が表示されます。複数行も表示可能です。
 │   └── other             ・・・画像以外を入れるフォルダ。記事内で/file/＊＊＊とすると参照する。
 │       ├── ＊＊＊.svg
 │       └── ＊＊＊.jpg
-│
-├── README.md             ・・・Githubリポジトリに表示される説明文。公開Webページには表示されない。
 │
 ├── hugo.toml             ・・・公開Webページの設定ファイル。原則編集しない。
 │
