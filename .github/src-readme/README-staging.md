@@ -157,7 +157,7 @@
    git push origin
    ```
 
-7. [Github リポジトリ](https://github.com/masaru-study/verify-note)に Web アクセスして結合する。
+7. [Github リポジトリ](https://github.com/masaru-study/-----test-----verify-note/)に Web アクセスして結合する。
 
    1. Pull Request
    2. New Pull Request
