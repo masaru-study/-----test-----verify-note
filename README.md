@@ -11,85 +11,157 @@
 
 - 権限のあるメンバーは hugo を使用して記事を投稿できます。
 
-1. Hugo をローカルに入れます。
-2. git をローカルに入れます。
+1. Hugo をローカルにインストールします。
 
-3. ローカルリポジトリを作成する
+2. git をローカルにインストールします。
+3. github CLI をローカルにインストールします。
 
-```bash
-git init
-```
+4. git の初期設定を行います。
 
-4. リモートリポジトリに接続する
+   1. おまじないを入力します。
 
-```bash
-git remote add origin https://github.com/masaru-study/-----test-----verify-note.git
-```
+   ```bash
+   git config --global init.defaultBranch default
+   git config --global user.name "名無し"
+   git config --global user.email nanasi@localhost.local
+   ```
 
-5. リモートリポジトリの内容を取得する
+   2. github CLI でログインします。
 
-```bash
-git fetch
-```
+   ```bash
+   gh auth login
+   > GitHub.Com
+   > HTTPS
+   > Paste an authentication token
+   > （発行したPersonal access tokenを貼り付ける）
+   gh auth status
+   ```
 
-6. ローカルブランチを作成する
+   3. github CLI のログイン情報を git で参照するようにします。
 
-```bash
-git checkout -b #ローカルブランチ名# origin/main
-```
+   ```bash
+   gh auth setup-git
+   ```
 
-7. hugo でコンテンツを作成する
+5. ローカルリポジトリの初期設定を行います。
 
-```bash
-hugo new content #カテゴリ名#/#ページ名#.md
-もしくは
-content/#カテゴリ名#/#ページ名#.mdを手動で新規作成
-```
+   1. 任意のディレクトリに移動して、ローカルリポジトリの作成を行います。
 
-8. 記事の Front Matter を編集する
+   ```bash
+   cd ~/hugo
+   git init
+   ```
 
-> [!CAUTION]
-> 投稿フォルダによって必須タグ要件が異なりますので付録を参照してください。
+   2. 名前とメールアドレスを設定します。メールアドレスは架空のもので大丈夫です。
 
-```bash
-content/#カテゴリ名#/#ページ名#.md
-```
+   ```bash
+   git config user.name "お名前"
+   git config user.email onamae@localhost.local
+   ```
 
-9. 記事の本文を編集する
+   3. リモートリポジトリに接続します。
 
-```bash
-content/#カテゴリ名#/#ページ名#.md
-```
+   ```bash
+   git remote add origin https://github.com/masaru-study/-----test-----verify-note.git
+   ```
 
-10. ワークツリーからインデックスへのファイルの登録を行う
+   4. リモートリポジトリの内容を取得します。
 
-```bash
-git add -A
-```
+   ```bash
+   git fetch
+   ```
 
-11. ローカルリポジトリに登録する
+   5. リモートリポジトリ内の main ブランチに追従する、ローカルリポジトリ内の default ブランチを作ります。
 
-```bash
-git commit -m "#コミットコメントを入れる#"
-```
+   ```bash
+   git branch default origin/main
+   ```
 
-12. リモートリポジトリにコピーする
+   6. 実際に変更を加える、ローカルリポジトリ内の post/onamae ブランチを作ります。
 
-```bash
-git push origin #ローカルブランチ名#
-```
+   ```bash
+   git branch post/onamae
+   ```
 
-13. [Github リポジトリ](https://github.com/masaru-study/-----test-----verify-note)に Web アクセスして結合する。
+6. 記事を作成します。
 
-    1. Pull Request
-    2. New Pull Request
-    3. base:main ← compare:#ローカルブランチ名#
-    4. Create request
-    5. Create pull request
-    6. Merge pull request
-    7. Confirm Merge
+   1. 使うブランチを default ブランチに変更します。
 
-14. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
+   ```bash
+   git checkout default
+   ```
+
+   2. リモートリポジトリ内の main ブランチの内容を取得してローカルリポジトリ内の default ブランチに適用します。
+
+   ```bash
+   git pull
+   ```
+
+   3. 使うブランチを post/onamae ブランチに変更します。
+
+   ```bash
+   git checkout post/onamae
+   ```
+
+   4. ローカルリポジトリ内の default ブランチの内容を post/onamae ブランチに適用します。
+
+   ```bash
+   git merge default
+   ```
+
+   5. hugo でコンテンツを作成します。
+
+   ```bash
+   hugo new content #カテゴリ名#/#ページ名#.md
+   ```
+
+   6. 記事の Front Matter を編集します。
+
+   > [!CAUTION]
+   > 投稿フォルダによって必須タグ要件が異なりますので付録を参照してください。
+
+   ```bash
+   vim content/#カテゴリ名#/#ページ名#.md
+   ```
+
+   7. 記事の本文を編集します。
+
+   ```bash
+   vim content/#カテゴリ名#/#ページ名#.md
+   ```
+
+   8. 作成した記事をワークツリーからインデックスへ登録を行います。
+
+   ```bash
+   git add -A
+   ```
+
+   9. インデックスの情報を post/onamae ブランチに適用します。
+
+   ```bash
+   git commit -m "#コミットコメントを入れる#"
+   ```
+
+   10. ローカルリポジトリ内の post/onamae ブランチをリモートリポジトリ内の post/onamae ブランチに適用します。
+
+   > [!CAUTION]
+   > 初回適用時はリモートリポジトリ内の post/onamae ブランチの新規作成になります。
+
+   ```bash
+   git push origin #ローカルブランチ名#
+   ```
+
+7. [Github リポジトリ](https://github.com/masaru-study/-----test-----verify-note)に Web アクセスして結合する。
+
+   1. Pull Request
+   2. New Pull Request
+   3. base:main ← compare:#ローカルブランチ名#
+   4. Create request
+   5. Create pull request
+   6. Merge pull request
+   7. Confirm Merge
+
+8. [公開 Web ページ](https://masaru-study.github.io/-----test-----verify-note/)を確認して更新されていれば完了
 
 > [!TIP]
 > ２回目以降の記事投稿は手順 5 ～ 14 を行ってください。
