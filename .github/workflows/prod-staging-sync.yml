@@ -1,0 +1,47 @@
+name: Sync from masaru-study/verify-note (prod)
+
+on:
+  # Github Actionsのタブから手動実行
+  workflow_dispatch:
+
+# Github Runnerのシェル
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # ジョブ
+  directory-changes:
+    # ジョブに必要な定義
+    name: Copy Assets
+    runs-on: ubuntu-latest
+
+    steps:
+      # staging側のリポジトリをclone
+      - name: Clone from staging
+        uses: actions/checkout@v4.1.4
+
+      # prod側リポジトリをclone
+      - name: Clone from masaru-study/verify-note (prod)
+        uses: actions/checkout@v4.1.4
+        with:
+          repository: masaru-study/verify-note
+          path: verify-note
+
+      # prod側リポジトリのファイルをstaging側リポジトリへコピー
+      - name: Copy files
+        run: |
+          cp verify-note/content/* content
+
+      # cloneしたprod側のファイルを削除
+      - name: Clean
+        run: rm -rf verify-note
+
+      # プルリク作成
+      - name: Create Pull Request
+        uses: Peter-evans/create-pull-request@v6.0.5
+        with:
+          commit-message: "Update Assets"
+          branch: sync/actions
+          branch-suffix: timestamp
+          base: main
