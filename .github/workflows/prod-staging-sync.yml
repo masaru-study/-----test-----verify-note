@@ -1,4 +1,4 @@
-name: Sync from masaru-study/verify-note (prod)
+name: Sync from prod
 
 on:
   # Github Actionsのタブから手動実行
@@ -17,25 +17,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # staging側のリポジトリをclone
-      - name: Clone from staging
-        uses: actions/checkout@v4.1.4
-
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
         uses: actions/checkout@v4.1.4
         with:
           repository: masaru-study/verify-note
-          path: verify-note
 
-      # prod側リポジトリのファイルをstaging側リポジトリへコピー
-      - name: Copy files
+      # staging側リポジトリをclone
+      - name: Clone from staging
+        uses: actions/checkout@v4.1.4
+        with:
+          path: -----test-----verify-note
+
+      # staging側リポジトリの一部ファイルを復元
+      # .github/worlflow/
+      # .github/README.md
+      - name: Restore files
         run: |
-          cp -r verify-note/content/* content
+          rm -rf .github/workflows && cp -r -----test-----verify-note/.github/workflows .github/workflows
+          unlink .github/README.md && ln -s .github/src-readme/README-staging.md .github/README.md
 
       # cloneしたprod側のファイルを削除
-      - name: Clean
-        run: rm -rf verify-note
+      - name: Clean files
+        run: rm -rf -----test-----verify-note
 
       # プルリク作成
       - name: Create Pull Request
