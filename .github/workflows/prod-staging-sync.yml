@@ -20,6 +20,8 @@ jobs:
       # staging側リポジトリをclone
       - name: Clone from staging
         uses: actions/checkout@v4.1.4
+        with:
+          path: staging
 
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
@@ -38,15 +40,14 @@ jobs:
       # .github/README.md
       - name: Restore files
         run: |
-          rm -rf "./prod/.git"
-          rsync -av --delete --exclude={"./prod/", "./prod/themes/", "./.github/workflows/prod-staging-sync.yml"} "./prod/" "./"
-          pushd "./.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
+          rsync -av --delete --exclude={".git/", ".github/workflows/prod-staging-sync.yml"} "./prod/" "./staging/"
+          pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
         run: |
           rm -rf "./prod"
-          ls -al ./
+          ls -al ./staging
 
       # プルリク作成
       #- name: Create Pull Request
