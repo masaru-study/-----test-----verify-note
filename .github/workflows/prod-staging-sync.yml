@@ -31,7 +31,7 @@ jobs:
       # prod側リポジトリのファイルをstaging側リポジトリへコピー
       - name: Copy files
         run: |
-          cp verify-note/content/* content
+          cp -r verify-note/content/* content
 
       # cloneしたprod側のファイルを削除
       - name: Clean
