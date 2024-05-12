@@ -27,19 +27,19 @@ jobs:
       - name: Clone from staging
         uses: actions/checkout@v4.1.4
         with:
-          path: -----test-----verify-note
+          path: staging-verify-note
 
       # staging側リポジトリの一部ファイルを復元
       # .github/worlflow/
       # .github/README.md
       - name: Restore files
         run: |
-          rm -rf ".github/workflows" && cp -r "-----test-----verify-note/.github/workflows" ".github/workflows"
-          unlink ".github/README.md" && ln -s ".github/src-readme/README-staging.md" ".github/README.md"
+          rm -rf "./.github/workflows" && cp -r "./staging-verify-note/.github/workflows" "./.github/workflows"
+          unlink "./.github/README.md" && cd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md"
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
-        run: rm -rf "-----test-----verify-note"
+        run: rm -rf "staging-verify-note"
 
       # プルリク作成
       - name: Create Pull Request
