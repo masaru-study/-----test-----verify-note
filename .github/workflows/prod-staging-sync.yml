@@ -13,7 +13,7 @@ jobs:
   # ジョブ
   directory-changes:
     # ジョブに必要な定義
-    name: Copy Assets
+    name: sync
     runs-on: ubuntu-latest
 
     steps:
@@ -28,17 +28,22 @@ jobs:
           repository: masaru-study/verify-note
           path: prod-verify-note
 
+      # 現在時刻を変数に格納
+      - name: Get Timestamp
+        id: timestamp
+        run: echo "value=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
       # staging側リポジトリの一部ファイルを復元
       # .github/worlflow/
       # .github/README.md
       - name: Restore files
         run: |
-          rsync -av --delete --exclude="./.git" --exclude="./.github/workflows" --dry-run "./prod-verify-note" "./" 
-          unlink "./.github/README.md" && cd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md"
+          rsync -av --delete --exclude="./.git" --exclude="./.github/workflows" "./prod-verify-note" "./" 
+          unlink "./.github/README.md" && pushd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
-        run: rm -rf "staging-verify-note"
+        run: rm -rf "./prod-verify-note"
 
       # プルリク作成
       - name: Create Pull Request
@@ -46,5 +51,5 @@ jobs:
         with:
           commit-message: "Update Assets"
           branch: sync/actions
-          branch-suffix: timestamp
+          branch-suffix: ${{ steps.timestamp.outputs.value }}
           base: main
