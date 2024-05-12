@@ -35,12 +35,13 @@ jobs:
         id: timestamp
         run: echo "value=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
-      # prod側をstaging側に反映。一部除外
-      # .git
-      # workflows
+      # prod側をstaging側に反映。一部除外(.git workflows)
+      # workflowsを別フォルダでコピー
+      # READMEをstaging用に切り替える。
       - name: Restore files
         run: |
           rsync -av --delete --exclude .git --exclude workflows "./prod/" "./staging/"
+          cp -r ./prod/.github/workflows ./staging/.github/prod-workflows
           pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
       #プルリク作成
@@ -51,9 +52,3 @@ jobs:
           branch: sync/actions-${{ steps.timestamp.outputs.value }}
           base: main
           path: ./staging
-
-      # 作成したプルリクをマージ
-      - name: Auto Merge
-        run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
-        env:
-          GH_TOKEN: ${{ github.token }}
