@@ -1,4 +1,4 @@
-name: Sync from prod
+name: SYNC-FROM-PROD
 
 on:
   # Github Actionsのタブから手動実行
@@ -17,24 +17,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # staging側リポジトリをclone
+      - name: Clone from staging
+        uses: actions/checkout@v4.1.4
+
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
         uses: actions/checkout@v4.1.4
         with:
           repository: masaru-study/verify-note
-
-      # staging側リポジトリをclone
-      - name: Clone from staging
-        uses: actions/checkout@v4.1.4
-        with:
-          path: staging-verify-note
+          path: prod-verify-note
 
       # staging側リポジトリの一部ファイルを復元
       # .github/worlflow/
       # .github/README.md
       - name: Restore files
         run: |
-          rm -rf "./.github/workflows" && cp -r "./staging-verify-note/.github/workflows" "./.github/workflows"
+          rsync -av --delete --exclude="./.git" --exclude="./.github/workflows" --dry-run "./prod-verify-note" "./" 
           unlink "./.github/README.md" && cd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md"
 
       # cloneしたprod側のファイルを削除
