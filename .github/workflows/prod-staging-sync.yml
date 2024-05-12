@@ -17,18 +17,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # staging側リポジトリをclone
+      - name: Clone from staging
+        uses: actions/checkout@v4.1.4
+
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
         uses: actions/checkout@v4.1.4
         with:
           repository: masaru-study/verify-note
           path: prod
-
-      # staging側リポジトリをclone
-      - name: Clone from staging
-        uses: actions/checkout@v4.1.4
-        with:
-          path: staging
 
       # 現在時刻を変数に格納
       - name: Get Timestamp
@@ -41,24 +39,25 @@ jobs:
       - name: Restore files
         run: |
           rm -rf "./prod/.git"
-          rsync -av --delete --exclude={"./staging/.git/*", "./staging/.github/workflows/prod-staging-sync.yml"} "./prod/" "./staging/" 
-          pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
-          ls -al ./staging
+          rsync -av --delete --exclude={"./prod/", "./prod/themes/", "./.github/workflows/prod-staging-sync.yml"} "./prod/" "./"
+          pushd "./.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
-        run: rm -rf "./prod"
+        run: |
+          rm -rf "./prod"
+          ls -al ./
 
       # プルリク作成
-      - name: Create Pull Request
-        uses: Peter-evans/create-pull-request@v6.0.5
-        with:
-          commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
-          branch: sync/actions-${{ steps.timestamp.outputs.value }}
-          base: main
+      #- name: Create Pull Request
+      #  uses: Peter-evans/create-pull-request@v6.0.5
+      #  with:
+      #    commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
+      #    branch: sync/actions-${{ steps.timestamp.outputs.value }}
+      #    base: main
 
       # 作成したプルリクをマージ
-      - name: Auto Merge
-        run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
-        env:
-          GH_TOKEN: ${{ github.token }}
+      #- name: Auto Merge
+      #  run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
+      #  env:
+      #    GH_TOKEN: ${{ github.token }}
