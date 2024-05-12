@@ -34,11 +34,11 @@ jobs:
         run: echo "value=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
       # staging側リポジトリの一部ファイルを復元
-      # .github/worlflow/
+      # .github/worlflow/prod-staging-sync.yml
       # .github/README.md
       - name: Restore files
         run: |
-          rsync -av --delete --exclude="./.git" --exclude="./.github/workflows" "./prod-verify-note" "./" 
+          rsync -av --delete --exclude="./.git" --exclude="./.github/workflows/prod-staging-sync.yml" "./prod-verify-note" "./" 
           unlink "./.github/README.md" && pushd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
       # cloneしたprod側のファイルを削除
@@ -47,21 +47,14 @@ jobs:
 
       # プルリク作成
       - name: Create Pull Request
-        id: create_pr
         uses: Peter-evans/create-pull-request@v6.0.5
         with:
           commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
           branch: sync/actions-${{ steps.timestamp.outputs.value }}
           base: main
 
-      # 作成したプルリクのパラメータ表示
-      - name: Check outputs
-        run: |
-          echo "Pull Request Number - ${{ steps.create_pr.outputs.pull-request-number }}"
-          echo "Pull Request URL - ${{ steps.create_pr.outputs.pull-request-url }}"
-
       # 作成したプルリクをマージ
       - name: Auto Merge
         run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
-        #env:
-        #    GH_TOKEN: ${{ secrets.PAT }}
+        env:
+          GH_TOKEN: ${{ github.token }}
