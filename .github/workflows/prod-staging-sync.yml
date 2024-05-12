@@ -43,19 +43,14 @@ jobs:
           rsync -av --delete --exclude .git --exclude prod-staging-sync.yml "./prod/" "./staging/"
           pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
-      # cloneしたprod側のファイルを削除
-      - name: Clean files
-        run: |
-          rm -rf "./prod"
-          ls -al ./staging
-
-      # プルリク作成
-      #- name: Create Pull Request
-      #  uses: Peter-evans/create-pull-request@v6.0.5
-      #  with:
-      #    commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
-      #    branch: sync/actions-${{ steps.timestamp.outputs.value }}
-      #    base: main
+      #プルリク作成
+      - name: Create Pull Request
+        uses: Peter-evans/create-pull-request@v6.0.5
+        with:
+          commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
+          branch: sync/actions-${{ steps.timestamp.outputs.value }}
+          base: main
+          path: ./staging
 
       # 作成したプルリクをマージ
       #- name: Auto Merge
