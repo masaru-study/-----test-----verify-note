@@ -35,12 +35,12 @@ jobs:
         id: timestamp
         run: echo "value=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
-      # staging側リポジトリの一部ファイルを復元
-      # .github/worlflow/prod-staging-sync.yml
-      # .github/README.md
+      # prod側をstaging側に反映。一部除外
+      # .git
+      # workflows
       - name: Restore files
         run: |
-          rsync -av --delete --exclude .git --exclude prod-staging-sync.yml "./prod/" "./staging/"
+          rsync -av --delete --exclude .git --exclude workflows "./prod/" "./staging/"
           pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
 
       #プルリク作成
@@ -53,7 +53,7 @@ jobs:
           path: ./staging
 
       # 作成したプルリクをマージ
-      #- name: Auto Merge
-      #  run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
-      #  env:
-      #    GH_TOKEN: ${{ github.token }}
+      - name: Auto Merge
+        run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
+        env:
+          GH_TOKEN: ${{ github.token }}
