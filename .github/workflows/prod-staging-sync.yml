@@ -34,12 +34,12 @@ jobs:
       # .github/README.md
       - name: Restore files
         run: |
-          rm -rf .github/workflows && cp -r -----test-----verify-note/.github/workflows .github/workflows
-          unlink .github/README.md && ln -s .github/src-readme/README-staging.md .github/README.md
+          rm -rf ".github/workflows" && cp -r "-----test-----verify-note/.github/workflows" ".github/workflows"
+          unlink ".github/README.md" && ln -s ".github/src-readme/README-staging.md" ".github/README.md"
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
-        run: rm -rf -----test-----verify-note
+        run: rm -rf "-----test-----verify-note"
 
       # プルリク作成
       - name: Create Pull Request
