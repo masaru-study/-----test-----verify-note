@@ -40,6 +40,7 @@ jobs:
         run: |
           rsync -av --delete --exclude="./.git" --exclude="./.github/workflows/prod-staging-sync.yml" "./prod-verify-note" "./" 
           unlink "./.github/README.md" && pushd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md" && popd
+          ls -al
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
@@ -49,21 +50,12 @@ jobs:
       - name: Create Pull Request
         uses: Peter-evans/create-pull-request@v6.0.5
         with:
-          commit-message: "Update Assets"
-          branch: sync/actions
-          branch-suffix: timestamp
+          commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
+          branch: sync/actions-${{ steps.timestamp.outputs.value }}
           base: main
 
-      # プルリク作成
-      #- name: Create Pull Request
-      #  uses: Peter-evans/create-pull-request@v6.0.5
-      #  with:
-      #    commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
-      #    branch: sync/actions-${{ steps.timestamp.outputs.value }}
-      #   base: main
-
       # 作成したプルリクをマージ
-      #- name: Auto Merge
-      #  run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
-      #  env:
-      #    GH_TOKEN: ${{ github.token }}
+      - name: Auto Merge
+        run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
+        env:
+          GH_TOKEN: ${{ github.token }}
