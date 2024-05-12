@@ -53,6 +53,14 @@ jobs:
           branch: sync/actions-${{ steps.timestamp.outputs.value }}
           base: main
 
+      # プルリク作成
+      - name: Create Pull Request
+        uses: Peter-evans/create-pull-request@v6.0.5
+        with:
+          commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
+          branch: sync/actions
+          base: main
+
       # 作成したプルリクをマージ
       #- name: Auto Merge
       #  run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
