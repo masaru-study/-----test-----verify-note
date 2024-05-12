@@ -17,18 +17,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # staging側リポジトリをclone
-      - name: Clone from staging
-        uses: actions/checkout@v4.1.4
-        with:
-          path: staging
-
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
         uses: actions/checkout@v4.1.4
         with:
           repository: masaru-study/verify-note
           path: prod
+
+      # staging側リポジトリをclone
+      - name: Clone from staging
+        uses: actions/checkout@v4.1.4
+        with:
+          path: staging
 
       # 現在時刻を変数に格納
       - name: Get Timestamp
@@ -40,7 +40,8 @@ jobs:
       # .github/README.md
       - name: Restore files
         run: |
-          rsync -av --delete --exclude={".git/*", ".github/workflows/prod-staging-sync.yml"} "./prod/*" "./staging" 
+          rm -rf "./prod/.git"
+          rsync -av --delete --exclude={"./staging/.git/*", "./staging/.github/workflows/prod-staging-sync.yml"} "./prod/" "./staging/" 
           pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
           ls -al ./staging
 
