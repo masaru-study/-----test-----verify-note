@@ -40,7 +40,7 @@ jobs:
       # .github/README.md
       - name: Restore files
         run: |
-          rsync -av --delete --exclude="./staging/.git" --exclude="./staging/.github/workflows/prod-staging-sync.yml" "./prod/*" "./staging" 
+          rsync -av --delete --exclude={".git/*", ".github/workflows/prod-staging-sync.yml"} "./prod/*" "./staging" 
           pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
           ls -al ./staging
 
