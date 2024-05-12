@@ -54,7 +54,7 @@ jobs:
           base: main
 
       # 作成したプルリクをマージ
-      - name: Auto Merge
-        run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
-        env:
-          GH_TOKEN: ${{ github.token }}
+      #- name: Auto Merge
+      #  run: gh pr merge --merge --auto sync/actions-${{ steps.timestamp.outputs.value }}
+      #  env:
+      #    GH_TOKEN: ${{ github.token }}
