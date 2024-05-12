@@ -20,13 +20,15 @@ jobs:
       # staging側リポジトリをclone
       - name: Clone from staging
         uses: actions/checkout@v4.1.4
+        with:
+          path: staging
 
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
         uses: actions/checkout@v4.1.4
         with:
           repository: masaru-study/verify-note
-          path: prod-verify-note
+          path: prod
 
       # 現在時刻を変数に格納
       - name: Get Timestamp
@@ -38,13 +40,13 @@ jobs:
       # .github/README.md
       - name: Restore files
         run: |
-          rsync -av --delete --exclude="./.git" --exclude="./.github/workflows/prod-staging-sync.yml" "./prod-verify-note" "./" 
-          unlink "./.github/README.md" && pushd "./.github" && ln -s "./src-readme/README-staging.md" "./README.md" && popd
-          ls -al
+          rsync -av --delete --exclude={".git/*", ".github/workflows/prod-staging-sync.yml"} "./prod/*" "./staging" 
+          pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
+          ls -al ./staging
 
       # cloneしたprod側のファイルを削除
       - name: Clean files
-        run: rm -rf "./prod-verify-note"
+        run: rm -rf "./prod"
 
       # プルリク作成
       - name: Create Pull Request
