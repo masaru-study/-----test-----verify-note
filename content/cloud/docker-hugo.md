@@ -3,8 +3,8 @@ title = "Dockerレシピ -Hugo Server-"
 date = 2024-05-12T00:56:16+09:00
 weight = 1
 draft = false
-categories = ["Server", "Cloud"]
-tags = ["Author:あゆむ", "Level:中級", "Docker"]
+categories = ["Server"]
+tags = ["Author:あゆむ", "Level:中級", "Type:Knowledge", "Docker"]
 +++
 
 ## 使い方

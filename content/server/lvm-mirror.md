@@ -4,7 +4,7 @@ date = 2024-05-04T17:18:05+09:00
 weight = 12
 draft = false
 categories = ["Server"]
-tags = ["Author:DD Erikson", "Level:中級", "Storage", "Linux", "LPIC/LinuC"]
+tags = ["Author:DD Erikson", "Level:中級", "Type:Handson", "Storage", "Linux", "LPIC/LinuC"]
 +++
 
 ## 目次
@@ -56,7 +56,7 @@ TX100 S3 の MegaRAID で 1TBHDD を 2 台つかって RAID1 しようとした�
 
 ## 概念図
 
-![概念図](/img/lvm-mirror.svg)
+![概念図](/img/lvm-mirror/lvm-mirror.svg)
 
 ## やったこと
 
