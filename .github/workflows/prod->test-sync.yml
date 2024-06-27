@@ -17,11 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # staging側リポジトリをclone
-      - name: Clone from staging
+      # test側リポジトリをclone
+      - name: Clone from test
         uses: actions/checkout@v4.1.4
         with:
-          path: staging
+          path: test
 
       # prod側リポジトリをclone
       - name: Clone from masaru-study/verify-note (prod)
@@ -35,14 +35,14 @@ jobs:
         id: timestamp
         run: echo "value=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
-      # prod側をstaging側に反映。一部除外(.git workflows)
+      # prod側をtest側に反映。一部除外(.git workflows)
       # workflowsを別フォルダでコピー
-      # READMEをstaging用に切り替える。
+      # READMEをtest用に切り替える。
       - name: Restore files
         run: |
-          rsync -av --delete --exclude .git --exclude workflows "./prod/" "./staging/"
-          cp -r ./prod/.github/workflows ./staging/.github/prod-workflows
-          pushd "./staging/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-staging.md" "./README.md" && popd
+          rsync -av --delete --exclude .git --exclude workflows "./prod/" "./test/"
+          cp -r ./prod/.github/workflows ./test/.github/prod-workflows
+          pushd "./test/.github" && unlink "./README.md" &&  ln -s "./src-readme/README-test.md" "./README.md" && popd
 
       #プルリク作成
       - name: Create Pull Request
@@ -51,4 +51,4 @@ jobs:
           commit-message: "Sync from prod ${{ steps.timestamp.outputs.value }}"
           branch: sync/actions-${{ steps.timestamp.outputs.value }}
           base: main
-          path: ./staging
+          path: ./test
