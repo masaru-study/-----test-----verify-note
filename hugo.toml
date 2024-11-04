@@ -9,7 +9,6 @@ relativeURLs = true # 相対パスを有効化する
   home = ['html', 'rss', 'search', 'searchpage'] # 検索機能オプション
 
 [params]
-  linkTitle = 'Verify-Note'
   themeVariant = ['relearn-light', 'relearn-dark', 'auto'] # 背景機能オプション
   disableNextPrev = false # [次へ]と[前へ]のナビゲーションボタンを隠す
   ordersectionsby = "weight" # メニューの表示順をweight値に設定
