@@ -1,11 +1,10 @@
 +++
-#テンプレート：議事録
-title = '{{ replace .File.ContentBaseName "-" " " | title }}'
-date = {{ .Date }}
-draft = false
-#weight = 99 # 順番を意図的に変更したい場合は変更する
+title = 'キックオフ議事録'
+date = 2024-05-03T01:15:32+09:00
+draft = true
+weight = 1
 categories = ["Projects"]
-tags = ["Author:", "Type:Minutes", "任意文字列"]
+tags = ["Author:あゆむ", "Type:Minutes", "DNS"]
 +++
 
 - [概要](#概要)
