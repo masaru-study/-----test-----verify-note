@@ -1,9 +1,10 @@
 baseURL = ''
 languageCode = 'ja'
 title = 'まさるの勉強部屋 ハンズオンチーム'
-theme = 'hugo-theme-relearn'
+theme = []"hugo-embed-pdf-shortcode","hugo-theme-relearn"]
 canonifyurls = true # baseurl を基点とした絶対パスを有効化する
 relativeURLs = true # 相対パスを有効化する
+enableInlineShortcodes = true
 
 [outputs]
   home = ['html', 'rss', 'search', 'searchpage'] # 検索機能オプション
