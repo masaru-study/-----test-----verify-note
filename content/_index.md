@@ -2,5 +2,3 @@
 archetype = "home"
 title = ""
 +++
-
-ようこそ！
