@@ -7,4 +7,4 @@ categories = ["Tutorial"]
 tags = ["Author:DD Erikson", "CCNA?", "network"]
 +++
 
-{{< embed-pdf url="/pdf/tutorial-pdf/VPN-handson.pdf" >}}
+{{< embed-pdf url="/pdf/tutorial-pdf/VPN-handson.pdf" renderPageNum="1" >}}
