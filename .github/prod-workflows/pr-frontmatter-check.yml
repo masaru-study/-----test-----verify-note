@@ -1,0 +1,163 @@
+name: PR-FRONTMATTER-CHECK
+
+# トリガー: PRが作成・更新された時
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+# PRの操作やコメントを記述するためのGITHUB_TOKEN権限
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+# Github Runnerのシェル
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # FrontMatterチェックジョブ
+  frontmatter-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # PRのブランチの内容をチェックアウト
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      # 記事の必須要件をチェック
+      - name: Front Matter check
+        id: check
+        continue-on-error: true
+        run: |
+          # チェック設定の定義（フォルダごとの必須タグを指定）
+          declare -A FOLDER_RULES=(
+            ["server"]="Author,Level,Type"
+            ["network"]="Author,Level,Type"
+            ["cloud"]="Author,Level,Type"
+            ["other"]="Author,Type"
+            ["projects"]="Author,Type"
+          )
+
+          # 選択肢の定義
+          declare -A VALID_OPTIONS=(
+            ["Level"]="初級,中級,上級,超上級,？？？"
+            ["Type"]="Handson,Knowledge,Minutes"
+          )
+
+          # フォルダベースのチェック関数
+          check_folder() {
+            local folder="$1"
+            local required_tags="$2"
+            local tag_line
+            
+            echo "::group::${folder}フォルダのチェック"
+            
+            for file in $(find "./content/$folder" -name '*.md' 2>/dev/null | grep -v '_index.md'); do
+              for tag_name in $(echo "$required_tags" | tr ',' ' '); do
+                tag_pattern="${tag_name}:"
+                tag_line=$(cat "$file" | sed -ne "/tags \= \[/p" | sed -ne "/\"${tag_pattern}/p")
+                if [ -z "$tag_line" ]; then
+                    error_files="$error_files\n- **$file**: ${tag_name}タグが不足"
+                else
+                  if [[ -n "${VALID_OPTIONS[$tag_name]}" ]]; then
+                    found_valid=false
+                    for opt_name in $(echo "${VALID_OPTIONS[$tag_name]}" | tr ',' ' '); do
+                      tag_value=$(echo "$tag_line" | sed -ne "/:${opt_name}\"/p")
+                      if [ -n "$tag_value" ]; then found_valid=true; break; fi
+                    done
+                    if [ "$found_valid" = false ]; then
+                      error_files="$error_files\n- **$file**: ${tag_name}タグの値が無効"
+                    fi
+                  fi
+                fi
+              done
+            done
+            
+            echo "::endgroup::"
+          }
+
+          # メイン処理
+          error_files=""
+          echo "::notice::FrontMatterチェックを開始します"
+
+          # 各フォルダルールに対してチェックを実行
+          for folder in "${!FOLDER_RULES[@]}"; do
+            required_tags="${FOLDER_RULES[$folder]}"
+            check_folder "$folder" "$required_tags"
+          done
+
+          # チェック結果の表示
+          if [ -z "$error_files" ]; then
+            echo "::notice::✅ すべてのFrontMatterチェックが成功しました"
+            exit 0
+          else
+            echo "::error::❌ エラーが見つかりました。このPRはマージできません。"
+            echo "::error::問題のあるファイル一覧:"
+            echo -e "$error_files"
+            {
+              echo 'error_files<<EOF'
+              echo -e "$error_files"
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+      # FrontMatterチェックが成功した場合、PRにコメント
+      - name: PR Comment on Success
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMENT_BODY=$(cat << "EOF"
+          ✅ **FrontMatterチェック: 成功**
+
+          すべての必須タグが正しく設定されています。このPRはマージ可能です。
+          EOF
+          )
+          echo "$COMMENT_BODY" | gh pr comment ${{ github.event.pull_request.number }} --body-file=-
+
+      # FrontMatterチェックが失敗した場合、PRにコメント
+      - name: PR Comment on Failure
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMENT_BODY=$(cat << "EOF"
+          ❌ **FrontMatterチェック: 失敗**
+          ⚠️ このPRは現在マージできません。以下の問題を修正してください：
+
+          ### 🔧 修正が必要なファイル
+          ${{ steps.check.outputs.error_files }}
+
+          ### 📋 必須タグの説明
+          - **Author:** すべてのコンテンツファイルに必要
+          - **Level:** server, network, cloudカテゴリのファイルに必要
+          - **Type:** general, tutorial以外のファイルに必要
+
+          ### 💡 修正例
+          ```toml
+          tags = [\"Author:あなたの名前\", \"Level:初級\", \"Type:Knowledge\"]
+          ```
+
+          ### 🔧 修正後の対応
+          1. 上記のエラーをすべて修正してください
+          2. 修正完了後、新しいPRを作成してください
+          3. または、このPRを再オープンして修正をpushしてください
+          EOF
+          )
+          echo "$COMMENT_BODY" | gh pr comment ${{ github.event.pull_request.number }} --body-file=-
+
+      # FrontMatterチェックが失敗した場合、PRをクローズ
+      - name: PR Close on Failure
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚫 **PR自動クローズします。**" | gh pr comment ${{ github.event.pull_request.number }} --body-file=-
+          gh pr close ${{ github.event.pull_request.number }}
