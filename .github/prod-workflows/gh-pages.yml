@@ -30,7 +30,9 @@ jobs:
     # ジョブに必要な定義
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.125.4
+      HUGO_VERSION: 0.148.2
+      THEME_VERSION: 8.0.0
+      DART_SASS_VERSION: 1.89.2
 
     # Discord通知有無を別jobに渡す
     outputs:
@@ -38,44 +40,16 @@ jobs:
 
     steps:
       # ブランチの内容をチェックアウト（ダウンロード）する
-      - name: Checkout
+      - name: Main Submodule
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-          fetch-depth: 0
+          submodules: false
 
-      # 記事の必須要件をチェック。
-      - name: Front Matter check
+      # Releanをバージョン指定でチェックアウト（ダウンロード）する
+      - name: Submodule Checkout
         run: |
-          er_cnt=0
-          # Authorタグのチェック
-          # 対象は、_index.md以外
-          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d"); do
-            tag_author=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Author:/p")
-            if [ -z "$tag_author" ]; then
-              echo "::error:: No Tag \"Author\": $file"
-              er_cnt=$(expr $er_cnt + 1)
-            fi
-          done
-          # Levelタグのチェック
-          # 対象は、_index.md以外、Generalフォルダ以外、Otherフォルダ以外、tutorialフォルダ以外、projectsフォルダ以外
-          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d" | sed -e "/content\/general/d" | sed -e "/content\/other/d" | sed -e "/content\/tutorial/d" | sed -e "/content\/projects/d" ); do
-            tag_level=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Level:/p")
-            if [ -z "$tag_level" ]; then
-              echo "::error:: No Tag \"Level\": $file"
-              er_cnt=$(expr $er_cnt + 1)
-            fi
-          done
-          # Typeタグのチェック
-          # 対象は、_index.md以外、Generalフォルダ以外、tutorialフォルダ以外
-          for file in $(find ./content/ -name '*.md' | sed -e "/_index.md/d" | sed -e "/content\/general/d" | sed -e "/content\/tutorial/d"); do
-            tag_level=$(cat $file | sed -ne "/tags \= \[/p" | sed -ne "/Type:/p")
-            if [ -z "$tag_level" ]; then
-              echo "::error:: No Tag \"Level\": $file"
-              er_cnt=$(expr $er_cnt + 1)
-            fi
-          done
-          if [ $er_cnt -eq 0 ]; then exit 0; else exit 1; fi
+          git submodule update --init --recursive --depth 1
+          git submodule foreach "git fetch --depth 1 origin tag ${THEME_VERSION} && git checkout ${THEME_VERSION}"
 
       # ルートディレクトリにno_discord.txtがあるか確認。
       - name: Check notification no_file
@@ -107,12 +81,20 @@ jobs:
       # Hugoのインストール
       - name: Install Hugo CLI
         run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+          WGET_URL="https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          wget -q ${WGET_URL} -O ${{ runner.temp }}/hugo.deb
+          sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
-      # Hugo依存関係パッケージのインストール
+      # Dirt-Sass(Hugo依存関係パッケージ)のインストール
       - name: Install Dart Sass
-        run: sudo snap install dart-sass
+        run: |
+          WGET_URL="https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
+          wget -q ${WGET_URL} -O ${{ runner.temp }}/dart-sass.tar.gz 
+          tar -xzf ${{ runner.temp }}/dart-sass.tar.gz -C ${{ runner.temp }}
+          sudo mv ${{ runner.temp }}/dart-sass /usr/local/
+          sudo chmod +x /usr/local/dart-sass/sass
+          sudo ln -s /usr/local/dart-sass/sass /usr/local/bin/sass
+          sudo ln -s /usr/local/dart-sass/sass /usr/local/bin/dart-sass
 
       # Github Pagesを設定
       - name: Setup Pages
@@ -133,7 +115,7 @@ jobs:
           hugo \
             --gc \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+            --baseURL "${{ steps.pages.outputs.base_url }}"
 
       # ビルドした結果をアップロード
       - name: Upload artifact
